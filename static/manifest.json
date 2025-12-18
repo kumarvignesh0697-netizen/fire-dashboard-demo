@@ -1,0 +1,8 @@
+{
+  "name": "Fire Service Dashboard",
+  "short_name": "Fire Dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#1f2937"
+}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- FLASH SUCCESS MESSAGE -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="alert alert-success">
+      {{ messages[0] }}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- SUMMARY CARDS -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow p-3 text-center">
+            <h6>Total Clients</h6>
+            <h2>{{ total_clients }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-3 text-center">
+            <h6>Active AMCs</h6>
+            <h2>{{ active }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-3 text-center">
+            <h6>AMCs Expiring Soon (≤ 30 days)</h6>
+            <h2>{{ expiring_soon }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-3 text-center">
+            <h6>Expired AMCs</h6>
+            <h2>{{ expired }}</h2>
+        </div>
+    </div>
+</div>
+
+<!-- UPCOMING AMC TABLE -->
+<div class="card shadow p-3">
+    <h5>Upcoming AMC Expirations</h5>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Service</th>
+                <th>AMC End Date</th>
+                <th>Days Remaining</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in upcoming %}
+            <tr>
+                <td>{{ row.Client_Name }}</td>
+                <td>{{ row.Service_Type }}</td>
+                <td>{{ row.AMC_End_Date }}</td>
+
+                <td>
+                    {% if row.Days_Remaining <= 7 %}
+                        <span class="text-danger fw-bold">{{ row.Days_Remaining }} days</span>
+                    {% elif row.Days_Remaining <= 15 %}
+                        <span class="text-warning fw-bold">{{ row.Days_Remaining }} days</span>
+                    {% else %}
+                        <span class="text-success fw-bold">{{ row.Days_Remaining }} days</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a href="/send_whatsapp/{{ row.Client_Name }}"
+                       class="btn btn-success btn-sm mb-1">
+                        WhatsApp
+                    </a>
+
+                    <a href="/generate_invoice/{{ row.Client_Name }}"
+                       class="btn btn-primary btn-sm mb-1">
+                        Invoice
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
