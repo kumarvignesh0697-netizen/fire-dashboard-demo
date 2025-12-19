@@ -17,7 +17,7 @@ PASSWORD = "demo123"
 # -------------------------
 # GOOGLE SHEET CONFIG
 # -------------------------
-SHEET_ID = "PASTE_YOUR_SHEET_ID_HERE"
+SHEET_ID = "1yBnfIni5qAjMM0_g90oxR2jXTgUlI98oaRz7Kz0g4sg"
 SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 # -------------------------
