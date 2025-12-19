@@ -1,141 +1,120 @@
 {% extends "base.html" %}
-
 {% block title %}Dashboard{% endblock %}
-
 {% block content %}
 
-<!-- FLASH SUCCESS MESSAGE -->
+<!-- FLASH MESSAGE -->
 {% with messages = get_flashed_messages() %}
   {% if messages %}
-    <div class="alert alert-success">
-      {{ messages[0] }}
-    </div>
+    <div class="alert alert-success">{{ messages[0] }}</div>
   {% endif %}
 {% endwith %}
 
 <!-- SUMMARY CARDS -->
-<div class="row mb-4">
-    <div class="col-12 col-md-3 mb-3">
-        <div class="card shadow p-3 text-center">
-            <h6>Total Clients</h6>
-            <h2>{{ total_clients }}</h2>
-        </div>
+<div class="row g-3 mb-4">
+  <div class="col-12 col-md-3">
+    <div class="card shadow p-3 text-center">
+      <h6>Total Clients</h6>
+      <h2>{{ total_clients }}</h2>
     </div>
-
-    <div class="col-12 col-md-3 mb-3">
-        <div class="card shadow p-3 text-center">
-            <h6>Active AMCs</h6>
-            <h2>{{ active }}</h2>
-        </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="card shadow p-3 text-center">
+      <h6>Active AMCs</h6>
+      <h2>{{ active }}</h2>
     </div>
-
-    <div class="col-12 col-md-3 mb-3">
-        <div class="card shadow p-3 text-center">
-            <h6>AMCs Expiring Soon (≤ 30 days)</h6>
-            <h2>{{ expiring_soon }}</h2>
-        </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="card shadow p-3 text-center">
+      <h6>AMCs Expiring Soon (≤ 30 days)</h6>
+      <h2>{{ expiring_soon }}</h2>
     </div>
-
-    <div class="col-12 col-md-3 mb-3">
-        <div class="card shadow p-3 text-center">
-            <h6>Expired AMCs</h6>
-            <h2>{{ expired }}</h2>
-        </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="card shadow p-3 text-center">
+      <h6>Expired AMCs</h6>
+      <h2>{{ expired }}</h2>
     </div>
+  </div>
 </div>
 
-<!-- UPCOMING AMC EXPIRATIONS -->
-<div class="card shadow p-3">
-    <h5 class="mb-3">Upcoming AMC Expirations</h5>
+<h5 class="mb-3">Upcoming AMC Expirations</h5>
 
-    <!-- DESKTOP TABLE -->
-    <div class="d-none d-md-block">
-        <table class="table table-striped align-middle">
-            <thead>
-                <tr>
-                    <th>Client</th>
-                    <th>Service</th>
-                    <th>AMC End Date</th>
-                    <th>Days Remaining</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for row in upcoming %}
-                <tr>
-                    <td>{{ row.Client_Name }}</td>
-                    <td>{{ row.Service_Type }}</td>
-                    <td>{{ row.AMC_End_Date }}</td>
-
-                    <td>
-                        {% if row.Days_Remaining <= 7 %}
-                            <span class="text-danger fw-bold">{{ row.Days_Remaining }} days</span>
-                        {% elif row.Days_Remaining <= 15 %}
-                            <span class="text-warning fw-bold">{{ row.Days_Remaining }} days</span>
-                        {% else %}
-                            <span class="text-success fw-bold">{{ row.Days_Remaining }} days</span>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        <a href="/send_whatsapp/{{ row.Client_Name }}"
-                           class="btn btn-success btn-sm mb-1">
-                            WhatsApp
-                        </a>
-
-                        <a href="/generate_invoice/{{ row.Client_Name }}"
-                           target="_blank"
-                           class="btn btn-primary btn-sm mb-1">
-                            Invoice
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- MOBILE CARD VIEW -->
-    <div class="d-block d-md-none">
+<!-- ===================== -->
+<!-- DESKTOP TABLE (md+) -->
+<!-- ===================== -->
+<div class="d-none d-md-block card shadow p-3">
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Client</th>
+          <th>Service</th>
+          <th>AMC End Date</th>
+          <th>Days Remaining</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
         {% for row in upcoming %}
-        <div class="card mb-3 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title mb-1">{{ row.Client_Name }}</h5>
-                <p class="text-muted mb-1">{{ row.Service_Type }}</p>
+        <tr>
+          <td>{{ row.Client_Name }}</td>
+          <td>{{ row.Service_Type }}</td>
+          <td>{{ row.AMC_End_Date }}</td>
+          <td>
+            {% if row.Days_Remaining <= 7 %}
+              <span class="text-danger fw-bold">{{ row.Days_Remaining }} days</span>
+            {% elif row.Days_Remaining <= 15 %}
+              <span class="text-warning fw-bold">{{ row.Days_Remaining }} days</span>
+            {% else %}
+              <span class="text-success fw-bold">{{ row.Days_Remaining }} days</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="/send_whatsapp/{{ row.Client_Name }}"
+               class="btn btn-success btn-sm mb-1">WhatsApp</a>
 
-                <p class="mb-2">
-                    <strong>AMC End Date:</strong><br>
-                    {{ row.AMC_End_Date }}
-                </p>
-
-                <p class="mb-3">
-                    <strong>Expires in:</strong>
-                    {% if row.Days_Remaining <= 7 %}
-                        <span class="text-danger fw-bold">{{ row.Days_Remaining }} days</span>
-                    {% elif row.Days_Remaining <= 15 %}
-                        <span class="text-warning fw-bold">{{ row.Days_Remaining }} days</span>
-                    {% else %}
-                        <span class="text-success fw-bold">{{ row.Days_Remaining }} days</span>
-                    {% endif %}
-                </p>
-
-                <div class="d-grid gap-2">
-                    <a href="/send_whatsapp/{{ row.Client_Name }}"
-                       class="btn btn-success">
-                        Send WhatsApp Reminder
-                    </a>
-
-                    <a href="/generate_invoice/{{ row.Client_Name }}"
-                       target="_blank"
-                       class="btn btn-primary">
-                        Generate Invoice
-                    </a>
-                </div>
-            </div>
-        </div>
+            <a href="/generate_invoice/{{ row.Client_Name }}"
+               target="_blank" rel="noopener"
+               class="btn btn-primary btn-sm">Invoice</a>
+          </td>
+        </tr>
         {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- MOBILE CARDS (< md) -->
+<!-- ===================== -->
+<div class="d-md-none">
+  {% for row in upcoming %}
+  <div class="card shadow-sm mb-3 p-3">
+    <h6 class="fw-bold mb-1">{{ row.Client_Name }}</h6>
+    <p class="mb-1"><strong>Service:</strong> {{ row.Service_Type }}</p>
+    <p class="mb-1"><strong>AMC End:</strong> {{ row.AMC_End_Date }}</p>
+
+    <p class="mb-2">
+      <strong>Days Remaining:</strong>
+      {% if row.Days_Remaining <= 7 %}
+        <span class="text-danger fw-bold">{{ row.Days_Remaining }} days</span>
+      {% elif row.Days_Remaining <= 15 %}
+        <span class="text-warning fw-bold">{{ row.Days_Remaining }} days</span>
+      {% else %}
+        <span class="text-success fw-bold">{{ row.Days_Remaining }} days</span>
+      {% endif %}
+    </p>
+
+    <div class="d-grid gap-2">
+      <a href="/send_whatsapp/{{ row.Client_Name }}"
+         class="btn btn-success btn-sm">WhatsApp</a>
+
+      <a href="/generate_invoice/{{ row.Client_Name }}"
+         target="_blank" rel="noopener"
+         class="btn btn-primary btn-sm">Invoice</a>
     </div>
+  </div>
+  {% endfor %}
 </div>
 
 {% endblock %}
