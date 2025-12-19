@@ -9,19 +9,19 @@ app = Flask(__name__)
 app.secret_key = "demo_secret_key"
 
 # -------------------------
-# DEMO LOGIN
+# DEMO LOGIN CREDENTIALS
 # -------------------------
 USERNAME = "admin"
 PASSWORD = "demo123"
 
 # -------------------------
-# GOOGLE SHEET
+# GOOGLE SHEET CONFIG
 # -------------------------
-SHEET_ID = "1yBnfIni5qAjMM0_g90oxR2jXTgUlI98oaRz7Kz0g4sg"
+SHEET_ID = "PASTE_YOUR_SHEET_ID_HERE"
 SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 # -------------------------
-# LOAD DATA
+# LOAD DATA FROM GOOGLE SHEET
 # -------------------------
 def load_data():
     df = pd.read_csv(SHEET_URL)
@@ -29,16 +29,18 @@ def load_data():
     return df
 
 # -------------------------
-# LOGIN
+# LOGIN PAGE
 # -------------------------
 @app.route("/", methods=["GET", "POST"])
 def login():
     error = None
+
     if request.method == "POST":
         if request.form.get("username") == USERNAME and request.form.get("password") == PASSWORD:
             return redirect(url_for("dashboard"))
         else:
             error = "Invalid username or password"
+
     return render_template("login.html", error=error)
 
 # -------------------------
@@ -69,7 +71,7 @@ def dashboard():
     )
 
 # -------------------------
-# WHATSAPP DEMO
+# WHATSAPP DEMO (FAKE SEND)
 # -------------------------
 @app.route("/send_whatsapp/<client_name>")
 def send_whatsapp(client_name):
@@ -77,16 +79,23 @@ def send_whatsapp(client_name):
     return redirect(url_for("dashboard"))
 
 # -------------------------
-# INVOICE PDF GENERATION
+# GENERATE INVOICE PDF
 # -------------------------
 @app.route("/generate_invoice/<client_name>")
 def generate_invoice(client_name):
     df = load_data()
-    client = df[df["Client_Name"] == client_name].iloc[0]
+
+    client = df[df["Client_Name"] == client_name]
+
+    if client.empty:
+        return "Client not found", 404
+
+    client = client.iloc[0]
 
     file_name = f"Invoice_{client_name.replace(' ', '_')}.pdf"
-    file_path = os.path.join(file_name)
+    file_path = os.path.join(os.getcwd(), file_name)
 
+    # CREATE PDF
     c = canvas.Canvas(file_path, pagesize=A4)
     width, height = A4
 
@@ -104,14 +113,17 @@ def generate_invoice(client_name):
     c.showPage()
     c.save()
 
-    return send_file(file_path, as_attachment=True)
+    # IMPORTANT:
+    # as_attachment=False allows mobile browsers to preview the PDF
+    return send_file(
+        file_path,
+        mimetype="application/pdf",
+        as_attachment=False
+    )
 
 # -------------------------
-# RUN APP
+# RUN APP (RENDER SAFE)
 # -------------------------
-import os
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
